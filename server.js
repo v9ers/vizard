@@ -113,7 +113,7 @@ var parseTime = function() {
 		return parseInt(data[1], 10) * 1000 * (times[alias[data[2]] || alias[data[2] + 's'] || data[2]] || 1);
 	};
 }();
- 
+
 var fork = function(respond, fn) {
 	if (!fn) {
 		fn = respond;
