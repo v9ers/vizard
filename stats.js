@@ -21,7 +21,7 @@ var trend = function(data,time,period) {
 	if(mean == last) {
 		return 0;
 	}
-	
+
 	if(last >= deviation+mean) {
 		return 1;
 	}
@@ -54,6 +54,77 @@ var std = function(data) {
 };
 exports.std = std;
 
+var unique = function(data) {
+    var a = [];
+    var l = data.length;
+    for(var i=0; i<l; i++) {
+      for(var j=i+1; j<l; j++) {
+        // If this[i] is found later in the array
+        if (data[i] === data[j])
+          j = ++i;
+      }
+      a.push(data[i]);
+    }
+    return a;	
+};
+
+var counts = function(data) {
+	var solo = unique(data.sort());
+	var ret = [];
+	for(var i =0;i<solo.length;i++) {
+		var count = 0;
+		for(var j =0;j<data.length;j++) {
+			if(solo[i] === data[j]) {
+				count++;
+			}
+		}
+		ret.push(count);
+	}
+	return ret;
+}
+
+var binwidth = function(data) {
+	// src http://en.wikipedia.org/wiki/Histogram#Number_of_bins_and_width
+	// Square-root choice
+	return Math.sqrt(data.length);
+	// socts-choice 
+	//return 3.49 * std(data) * Math.pow(average(data),-1/3);
+};
+
+var histogram = function(data) {
+	// doing a dummy historgram of bin 1 for now
+	return counts(data);
+/*
+	data.sort();
+
+	var solo = unique(data);
+	var bin = binwidth(data);
+	var results = [];
+	
+	var begin = data[0];
+	var count = 0;
+
+	console.log(bin,begin);
+	
+	var begin = solo[0];
+
+	for(var j = 0; j < solo.length; j++) {
+		if(solo[j] >= begin + bin) {
+			begin = solo[j];
+			console.log(begin);
+			for(var i = 0; i < data.length; i++) {
+				if(data) {
+					
+				}
+			}
+			results.push(solo[j]);
+		}
+	}
+	return results;
+	*/
+};
+exports.histogram = histogram;
+
 var min = function(data,time) {
 	var index = 0;
 	var last = data[0];
@@ -80,7 +151,3 @@ var max = function(data,time) {
 	return {value:data[index],time:time[index]};
 };
 exports.max = max;
-
-var bellify = function(data) {
-	
-};
