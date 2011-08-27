@@ -3,6 +3,7 @@ var db = require('mongojs').connect('v9ers:qweqwe@staff.mongohq.com:10013/vizard
 var jsonify = require('jsonify');
 var common = require('common');
 var parseURL = require('url').parse;
+var nko = require('nko')('2Fv892xsR2NIoRAq');
 
 var analyzor = function() {
 	var that = {};

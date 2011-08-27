@@ -1,0 +1,16 @@
+{
+  "author": "V9ers",
+  "name": "vizard",
+  "description": "Visualize your data easily.",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/v9ers/vizard.git"
+  },
+  "main": "server.js",
+  "engines": {
+    "node": "v0.4.9"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
