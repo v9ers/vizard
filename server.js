@@ -2,6 +2,7 @@ var server = require('router').create();
 var db = require('mongojs').connect('v9ers:qweqwe@staff.mongohq.com:10013/vizard', ['graph', 'series']);
 var jsonify = require('jsonify');
 var common = require('common');
+var nko = require('nko')('2Fv892xsR2NIoRAq');
 
 var analyzor = function() {
 	var that = {};
