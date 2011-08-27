@@ -8,14 +8,20 @@ var sum = function(data) {
 var trend = function(data,time,period) {
 	var last = data[data.length - 1];
 
+
 	// dead trend
-	if(time[time.length - 1] - time[time.length - 2] >= period) {
+
+	if(time && time[time.length - 1] - time[time.length - 2] >= period) {
 		return 0;
 	}
 
 	var mean = average(data);
 	var deviation = std(data);
 
+	if(mean == last) {
+		return 0;
+	}
+	
 	if(last >= deviation+mean) {
 		return 1;
 	}
@@ -74,3 +80,7 @@ var max = function(data,time) {
 	return {value:data[index],time:time[index]};
 };
 exports.max = max;
+
+var bellify = function(data) {
+	
+};
