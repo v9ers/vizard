@@ -8,7 +8,6 @@ var sum = function(data) {
 var trend = function(data,time,period) {
 	var last = data[data.length - 1];
 
-
 	// dead trend
 
 	if(time && time[time.length - 1] - time[time.length - 2] >= period) {
@@ -69,7 +68,7 @@ var unique = function(data) {
 };
 
 var counts = function(data) {
-	var solo = unique(data.sort());
+	var solo = unique(data.sort(function(a,b){return a-b}));
 	var ret = [];
 	for(var i =0;i<solo.length;i++) {
 		var count = 0;
@@ -83,9 +82,12 @@ var counts = function(data) {
 	return ret;
 }
 
-var binwidth = function(data) {
+var bin = function(data) {
 	// src http://en.wikipedia.org/wiki/Histogram#Number_of_bins_and_width
 	// Square-root choice
+	//if(unique(data.sort()) <= 10) {
+	//	return 1;
+	//}
 	return Math.sqrt(data.length);
 	// socts-choice 
 	//return 3.49 * std(data) * Math.pow(average(data),-1/3);
@@ -93,35 +95,37 @@ var binwidth = function(data) {
 
 var histogram = function(data) {
 	// doing a dummy historgram of bin 1 for now
-	return counts(data);
-/*
-	data.sort();
 
-	var solo = unique(data);
-	var bin = binwidth(data);
-	var results = [];
-	
-	var begin = data[0];
-	var count = 0;
-
-	console.log(bin,begin);
-	
+	var cs = counts(data);
+	var solo = unique(data.sort(function(a,b){return a-b}));
+	var ret = [];
+	var b = bin(data);
 	var begin = solo[0];
 
-	for(var j = 0; j < solo.length; j++) {
-		if(solo[j] >= begin + bin) {
-			begin = solo[j];
-			console.log(begin);
-			for(var i = 0; i < data.length; i++) {
-				if(data) {
-					
-				}
-			}
-			results.push(solo[j]);
+	if(b === 1) {
+		for(var i = 0;i<cs.length;i++) {
+			ret.push({x:solo[i],y:cs[i]});
 		}
+		return ret;
 	}
-	return results;
-	*/
+	
+	var labels = [];
+	var count = 0;
+	for(var i = 0;i<cs.length;i++) {
+		if(solo[i] >= begin + b) {
+			var x = begin +  "-" + solo[i-1] || '';
+			if(begin === solo[i-1]) {
+				x = begin;
+			}
+			ret.push({x:x || '',y:count});
+			labels.push();
+			begin = solo[i];
+			count = 0;
+		}
+		count += cs[i];
+		ret.push();
+	}
+	return ret;
 };
 exports.histogram = histogram;
 
