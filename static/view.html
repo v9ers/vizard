@@ -8,18 +8,26 @@
 
 		<!--[if lte IE 9]><link rel="stylesheet" href="css/ie.css" type="text/css" media="screen" /><![endif]-->
 		<link rel="stylesheet" href="css/1140.css" type="text/css" media="screen" />
+		<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" />
 		<style>
 		body {
-		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		}
+		li {
+			float:left;
+			margin-right: 10px;
+		}
+		.container p {
+			color: #fff;
+			line-height: 50px;
+			background: #000;
+			text-align: center;
+			padding-left: 10px;
+			margin: 10px 0 0 0;
 		}
 
-		.container p {
-		color: #fff;
-		line-height: 50px;
-		background: #000;
-		text-align: center;
-		padding-left: 10px;
-		margin: 10px 0 0 0;
+		.number-value, .number-stats, .stat-cell {
+			float:left;
 		}
 		</style>
 
@@ -32,11 +40,45 @@
 		</script>
 	</head>
 	<body>
+		<div class="container">
+			<div class="row">
+				<div class='twocol'>
+					<p>Range</p>
+				</div>
+				<div class='ninecol'>
+					<p>
+					<ul>
+						<li><a href='#last week'>Today</a></li>
+						<li><a href='#last week'>Yesterday</a></li>
+						<li><a href='#last week'>Last week</a></li>
+						<li><a href='#last week'>Last 100 entries</a></li>
+					</ul>
+					</p>
+				</div>
+				<div class='onecol last'>
+					<p>help</p>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="threecol">
+					<p>Bell</p>
+				</div>
+				<div class="fivecol">
+					<p>Line</p>
+				</div>
+				<div class="fourcol last">
+					<p>Number</p>
+				</div>
+			</div>
+		</div>
+		
 		<div class='number'>
 			<div class="container">
 				<div class="row">
 					<div class='twelevecol last'>
-						<p style='text-align:left'>Property</p>
+						<p style='text-align:left'>Number</p>
 					</div>
 				</div>
 			</div>
@@ -50,6 +92,81 @@
 					</div>
 					<div class="fourcol last">
 					<p>Number</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class='bool'>
+			<div class="container">
+				<div class="row">
+					<div class='twelevecol last'>
+						<p style='text-align:left'>Bool</p>
+					</div>
+				</div>
+			</div>
+			<div class="container">
+				<div class="row">
+					<div class="eightcol">
+						<p>Line</p>
+					</div>
+					<div class="fourcol last">
+						<div class='number-widget'>
+								<div class='number-value'>98</div>
+								<div class='number-stats'>
+									<div class='stat-row'>
+										<div class='stat-cell'>high<br>date</div>
+										<div class='stat-cell'>avrg</div>
+									</div>
+									<div style='clear:both'></div>
+									<div class='stat-row'>
+										<div class='stat-cell'>low<br>date</div>
+										<div class='stat-cell'>std</div>
+									</div>
+									<div style='clear:both'></div>
+								</div>
+								<div style='clear:both'></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class='string'>
+			<div class="container">
+				<div class="row">
+					<div class='twelevecol last'>
+						<p style='text-align:left'>String</p>
+					</div>
+				</div>
+			</div>
+			<div class="container">
+				<div class="row">
+					<div class="eightcol">
+					<p>Pie</p>
+					</div>
+					<div class="fourcol last">
+						<table>
+							<tr><td>10000</td><td>54 %</td><td>foo</td></tr>
+							<tr><td>1000</td><td>5.4 %</td><td>bar</td></tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class='data'>
+			<div class="container">
+				<div class="row">
+					<div class='twelevecol last'>
+						<p style='text-align:left'>Data</p>
+					</div>
+				</div>
+			</div>
+			<div class="container">
+				<div class="row">
+					<div class="twocol">
+					<p>Pie</p>	
+					</div>
+					<div class="tencol last">
+						<p>Document</p>
 					</div>
 				</div>
 			</div>
