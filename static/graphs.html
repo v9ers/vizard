@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Vizard Graphs</title>
+		<style>
+			.paint {
+				width: 300px;
+				height: 200px;
+			}
+		</style>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script> 
+		<script type="text/javascript" src="js/highcharts.js"></script>
+		<script>
+			var vizarder = function(id) {
+				var chart;
+				var firstData = {
+					categories: [],
+					values: []
+				};
+				
+				$(function() {
+					chart = new Highcharts.Chart({
+						chart: {
+							renderTo: id,
+							defaultSeriesType: 'column'
+						},
+						credits: {
+							enabled: false
+						},
+						legend: {
+							enabled: false
+						},
+						title: {
+							text: ''
+						},
+						xAxis: {
+							categories: firstData.categories
+						},
+						yAxis: {
+							title: {
+								text: ''
+							}
+						},
+						plotOptions: {
+							column: {
+								pointPadding: 0.2,
+								borderWidth: 0
+							}
+						},
+						tooltip: {
+							formatter: function() {
+								return this.x + ' : <b>' + this.y + '</b>';
+							}
+						},
+						series: [{
+							data: firstData.values
+						}]
+					});
+				});
+				
+				return {
+					set: function(data) {
+						if (!chart) {
+							for (var category in data.values) {
+								firstData.categories.push(category);
+								firstData.values.push(data.values[category]);
+							}
+							return;
+						}
+
+						/* Here follows: Super-Advanced-Diff-Algorithm-By-Bjarke */
+
+						var mustRedraw = false;
+
+						// Store list of current bars in chart.
+						var currentCategories = {};
+						chart.series[0].data.forEach(function(point) {
+							currentCategories[point.category] = point;
+						});
+
+						// Remove bars not needed any more.
+						Object.keys(currentCategories).forEach(function(category) {
+							if (!(category in data.values)) {
+								// Current category not in new data, so remove the bar.
+								currentCategories[category].remove(false, true);
+								mustRedraw = true;
+							}
+						});
+
+						// Update existing points as needed.
+						var addCategories = {};
+						Object.keys(data.values).forEach(function(category) {
+							var value = data.values[category];
+							if (category in currentCategories) {
+								var point = currentCategories[category];
+								if (point.y !== value) {
+									point.update(value, false, true);
+									mustRedraw = true;
+								}
+							} else {
+								addCategories[category] = value;
+							}
+						});
+
+						// Create new bars as needed.
+						var series = chart.series[0];
+						var categories = chart.xAxis[0].categories;
+						for (var category in addCategories) {
+							var value = addCategories[category];
+							series.addPoint(value, false, false, true);
+							categories.push(category);
+							mustRedraw = true;
+						}
+
+						if (mustRedraw) {
+							chart.redraw();
+						}
+
+					}
+				};
+			};
+			
+			var vizard = vizarder('holder');
+
+			function pollForMoreData() {
+				$.getJSON('http://10.0.1.30:8008/v/freeall', function(data) {
+					vizard.set(data.country.graph.bar);
+				})
+			}
+
+			pollForMoreData();
+			setInterval(pollForMoreData, 1000);
+		</script>
+	</head>
+	<body>
+		<h1>Vizard Graphs</h1>
+		<div id="holder"></div>
+	</body>
+</html>
