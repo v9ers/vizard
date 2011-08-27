@@ -24,7 +24,7 @@
 					xAxis: {
 						categories: firstData.categories,
 						labels: {
-							step: (type === 'line' ? 50 : null)
+							step: (type === 'line' ? 4 : null)
 						}
 					},
 					yAxis: {
