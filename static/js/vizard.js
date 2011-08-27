@@ -53,49 +53,50 @@
 			return {
 				set: function(data) {
 					if (!chart) {
-						for (var category in data.values) {
-							firstData.categories.push(category);
-							firstData.values.push(data.values[category]);
-						}
+						firstData = data;
 						return;
 					}
 
 					var mustRedraw = false;
 					var series = chart.series[0];
-					var categories = chart.xAxis[0].categories;
-					var numberOfBars = categories.length;
-					var index = 0;
+					var xs = chart.xAxis[0].categories;
+					var numberOfBars = xs.length;
 					var modifiedBars = [];
 
-					for (var category in data.values) {
-						var value = data.values[category];
-						if (index >= numberOfBars) {
-							categories.push(category);
-							series.addPoint(value, false, false, true);
+					for (var i=0; i<data.length; i++) {
+						var x = data[i].x;
+						var y = data[i].y;
+						
+						if (i >= numberOfBars) {
+							xs.push(x);
+							series.addPoint(y, false, false, true);
 							mustRedraw = true;
 						} else {
-							var bar = series.data[index];
-							if (categories[index] !== category || bar.y !== value) {
+							var bar = series.data[i];
+							if (xs[i] !== x || bar.y !== y) {
 
-								if (categories[index] !== category && category !== 'Others') {
+								if (xs[i] !== x && x !== 'Others') {
 									bar.graphic.css({ 'fill-opacity': 0.75 });
 									modifiedBars.push(bar);
 								}
 
-								categories[index] = category;
-								bar.update(value, false, true);
+								xs[i] = x;
+								bar.update(y, false, true);
 								mustRedraw = true;
 							}
 						}
-						index++;
 					}
-					for (var i = index; i < numberOfBars; i++) {
+
+					for (var i=data.length; i<numberOfBars; i++) {
 						series.data[i].remove(false, true);
 						mustRedraw = true;
 					}
+					
+					xs.length = data.length;
 
 					if (mustRedraw) {
 						chart.redraw();
+						
 						(function(modifiedBars) {
 							setTimeout(function() {
 								modifiedBars.forEach(function(bar) {
@@ -104,7 +105,6 @@
 							}, 750);
 						}(modifiedBars));
 					}
-
 				}
 			};
 		};

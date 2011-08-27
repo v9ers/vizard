@@ -21,15 +21,34 @@
 
 			function pollForMoreData() {
 				$.getJSON('http://10.0.1.30:8008/v/freeall', function(data) {
-					countries.set(data.country.graph.bar);
+					var countryData = [];
+					var userData = [];
 					
-					var values = {};
-					
-					for (var i=0; i<data.users.graph.line.x.length; i++) {
-						values[data.users.graph.line.x[i]] = data.users.graph.line.y[i];
+					for (var i in data.country.graph.bar.values) {
+						countryData.push({x:i, y:data.country.graph.bar.values[i]});
 					}
+					for (var i=0; i<data.users.graph.line.x.length; i++) {
+						userData.push({x:data.users.graph.line.x[i], y:data.users.graph.line.y[i]});
+					}
+					
+					countryData.sort(function(a,b) {
+						var sorting = {
+							Others: 1
+						};
+						var cmp = (sorting[a.x] || 0) - (sorting[b.x] || 0);
+						
+						if (cmp !== 0) {
+							return cmp;
+						}
 
-					users.set({values: values});
+						return b.y - a.y;
+					});
+					userData.sort(function(a,b) {
+						return a.x - b.x;
+					});
+				
+					countries.set(countryData);
+					users.set(userData);
 				});
 			}
 
