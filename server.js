@@ -1,86 +1,122 @@
 var server = require('router').create();
+var db = require('mongojs').connect('v9ers:qweqwe@staff.mongohq.com:10013/vizard', ['graph', 'series']);
 var jsonify = require('jsonify');
+var common = require('common');
 
-var map = {}; // yes should be a DB!
-
-var smartify = function(key, data) {
+var analyzor = function() {
 	var that = {};
 
-	if (typeof data === 'number') {
-		that.graph = 'line';
-		that.x = [];
-		that.y = [];
-		
-		that.push = function(data) {
-			that.x.push(Date.now());
-			that.y.push(data);
-		};
+	var add = function(data, serie) {
+		if (typeof data === 'number') {
+			var line = {x:[],y:[]};
 
-		return that;
-	}
-	if (typeof data === 'boolean') {
-		that.graph = 'boolean';
-		that.t = 0;
-		that.f = 0;
+			that.graph = {line:line};
+			that.total = 0;
 
-		that.push = function(data) {
-			if (data) {
-				that.t++;
-			} else {
-				that.f++;
-			}
-		};
-		return that;
-	}
-	if (typeof data === 'string') {
-		that.graph = 'pie';
-		that.values = {};
+			add = function(data, serie) {
+				that.total += data;
 
-		that.push = function(data) {
-			that.values[data] = (that.values[data] || 0) + 1;
-		};
-		return that;
+				line.x.push(serie.time);
+				line.y.push(data);
+			};
+		}
+		if (typeof data === 'boolean') {
+			var choice = {yes:0, no:0};
+
+			that.graph = {choice:choice};
+
+			add = function(data, serie) {
+				data = data ? 'yes' : 'no';
+
+				choice[data]++;
+			};
+		}
+		if (typeof data === 'string') {
+			var bar = {values:{}};
+
+			that.graph = {bar:bar};
+
+			add = function(data, serie) {
+				bar.values[data] = (bar.values[data] || 0) + 1;
+			};
+		}
+		if (typeof data === 'object') {
+			add = function(data, serie) {
+				
+			};
+		}
+		add(data, serie); // bootstrap
+	};
+
+	that.push = function(data, serie) {
+		if (Array.isArray(data)) {
+			data.forEach(function(data) {
+				that.push(data, serie);
+			});
+			return;
+		}
+		add(data, serie);		
+	};
+
+	return that;
+};
+var fork = function(respond, fn) {
+	if (!fn) {
+		fn = respond;
 	}
+
+	return function(err, value) {
+		if (err) {
+			respond(500, {error:err.message});
+			return;
+		}
+		fn(value);
+	};
 };
 
 server.post('/r/{id}', jsonify(function(request, data, respond) {
-	var m = map[request.params.id];
+	data.id = request.params.id;
+	data.time = data.time || Date.now();
 
-	if (!m) {
-		m = map[request.params.id] = {};
-
-		for (var i in data) {
-			m[i] = smartify(i, data[i], data);
-		}
-	}
-
-	for (var i in m) {
-		m[i].push(data[i], data);
-	}
-
-	respond({ok:true});
+	db.series.save(data, fork(respond, function() {
+		respond({success:true});
+	}));
 }));
-
 server.get('/r/{id}', jsonify(function(request, respond) {
-	respond('not supported :(');
+	db.series.find({id:request.params.id}, {_id:0}, fork(respond));
 }));
-
 server.get('/v/{id}/{name}?', jsonify(function(request, respond) {
-	var data = map[request.params.id] || {};
+	common.step([
+		function(next) {
+			db.series.find({id:request.params.id}, {_id:0}, next);
+		},
+		function(series) {
+			if (!series.length) {
+				respond(404);
+				return;
+			}
+			var name = request.params.name;
+			var result = {};
 
-	if (request.params.name) {
-		respond(data[request.params.name]);
-		return;
-	}
-	respond(data);
-}));
+			series.forEach(function(serie) {
+				var keys = name ? [name] : Object.keys(serie);
 
-server.get('/', jsonify(function(request, respond) {
-	respond(data);
-}));
-server.post('/', jsonify(function(request, body, respond) {
-	data.push(body);
-	respond({success:true});
+				keys.forEach(function(key) {
+					if (key === 'time' || key === 'id') {
+						return;
+					}
+					if (!(key in serie)) {
+						return;
+					}
+					var analyse = result[key] = result[key] || analyzor(key, serie[key]);
+
+					analyse.push(serie[key], serie);					
+				});
+			});
+
+			respond(result);
+		}
+	], fork(respond));
 }));
 
 server.listen(8008);
