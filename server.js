@@ -343,6 +343,7 @@ server.get('/v/{id}/{*}?', jsonify(function(request, respond) {
 	], fork(respond));
 }));
 
+server.get('/', '/s/index.html', server.route);
 server.get('/s/*', function(request, response) {
 	// security blah blah - use lib
 	fs.readFile('./static/'+request.params.wildcard, function(err, res) {
