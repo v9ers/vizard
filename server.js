@@ -351,7 +351,7 @@ server.get('/g/*', function(request, response) {
 	};
 
 	db.series.findOne({id:request.params.wildcard.split('/')[0]}, function(err, exists) {
-		fs.readFile(exists ? './static/graphs.html' : './static/add.html', common.fork(onerror, function(buf) {
+		fs.readFile(exists ? './static/view.html' : './static/view.html', common.fork(onerror, function(buf) {
 			response.writeHead(200);
 			response.end(buf);
 		}));
