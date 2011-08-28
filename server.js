@@ -313,19 +313,19 @@ server.get('/s/*', function(request, response) {
 		response.end(res);
 	});
 });
-server.get('/{id}', '/g/{id}', server.route);
-server.get('/g/{id}', function(request, response) {
+server.get('/g/*', function(request, response) {
 	var onerror = function() {
 		response.writeHead(500);
 		response.end('oh no');
 	};
 
-	db.series.findOne({id:request.params.id}, function(err, exists) {
+	db.series.findOne({id:request.params.wilcard.split('/')[0]}, function(err, exists) {
 		fs.readFile(exists ? './static/graphs.html' : './static/add.html', common.fork(onerror, function(buf) {
 			response.writeHead(200);
 			response.end(buf);
 		}));
 	});
 });
+server.get('/*', '/g/*', server.route);
 
 server.listen(8008);
