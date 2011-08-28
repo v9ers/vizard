@@ -18,6 +18,14 @@ li {
 
 }
 
+.head div {
+	line-height: 20px;
+	text-align: right;
+	margin-top: 4px;
+	padding-left: 15px;	
+	padding-right: 15px;
+}
+
 .chart {
 	height: 200px;
 }
@@ -83,6 +91,11 @@ li {
 	line-height: 26px;
 }
 
+a {
+	font-size: 12px;
+	text-decoration: none;
+	color: #2790B0;
+}
 .string-widget td {
 	padding: 0 25px;
 }
@@ -90,6 +103,9 @@ li {
 .string-value {
 	text-align: left;
 	padding-left: 0 !important;
+	max-width: 80px;
+	overflow-x: hidden;
+	white-space: nowrap;
 }
 
 .string-count, .string-percentage {
