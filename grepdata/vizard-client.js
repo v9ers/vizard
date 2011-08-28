@@ -52,8 +52,7 @@ exports.post = function(name, data) {
 
 	http.request({
 		method: 'POST',
-		host: '10.0.1.30',
-		port: 8008,
+		host: '109.74.206.232',
 		path: '/r/' + name,
 		headers: {
 			'Content-Length': '' + Buffer.byteLength(json)
