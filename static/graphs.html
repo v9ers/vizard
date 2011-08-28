@@ -4,58 +4,120 @@
 		<meta charset="UTF-8">
 		<title>Vizard Graphs</title>
 		<style>
-			#countries, #users {
-				width: 500px;
-				height: 400px;
+			.graph {
+				width: 300px;
+				height: 150px;
 			}
 			.left {
 				float: left;
 			}
 		</style>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script> 
-		<script type="text/javascript" src="js/highcharts.js"></script>
+		<script type="text/javascript" src="js/highcharts.src.js"></script>
 		<script type="text/javascript" src="js/vizard.js"></script>
 		<script>
-			var countries = vizard.create('countries', 'column');
-			var users = vizard.create('users', 'line');
+			var gensym = (function() {
+				var i=0;
+				
+				return function() {
+					return 's'+i++;
+				};
+			})();
+			
+			var graphs = {};
 
-			function pollForMoreData() {
-				$.getJSON('http://10.0.1.30:8008/v/freeall?period=1s', function(data) {
-					var countryData = [];
-					var userData = data.users.graph.line;
+			var create = function(data, type) {
+				var id = gensym();
+				var html = '<div class="left graph" id="'+id+'"></div>';
 
-					for (var i in data.country.graph.bar) {
-						countryData.push({x:i, y:data.country.graph.bar[i]});
+				$('body').append(html);
+				
+				if (type in {'bar':1, 'trend':1}) {
+					type = 'column';
+				}
+				var graph = vizard.create(id, type);
+
+				graph.set(data);
+				
+				return graph;
+			};
+			var lineSort = function(a,b) {
+				return a.x - b.x;
+			};
+			var columnSort = function(a,b) {
+				var sorting = {
+					Others: 1
+				};
+				var cmp = (sorting[a.x] || 0) - (sorting[b.x] || 0);
+
+				if (cmp !== 0) {
+					return cmp;
+				}
+
+				cmp = b.y - a.y;
+
+				if (cmp !== 0) {
+					return cmp;
+				}
+
+				return a.x.toUpperCase().localeCompare(b.x.toUpperCase());
+			};			
+			var insertData = function(data, name, type) {
+				if (type === 'line') {
+					data.sort(lineSort);
+					/*data[set].line.forEach(function(item) {
+						item.x = new Date(item.x).toUTCString();
+					});*/
+				}
+				if (type in {'bar':1, 'trend':1}) {
+					var realData = [];
+					
+					for (var i in data) {
+						realData.push({x:i, y:data[i]});
 					}
+					
+					data = realData.sort(columnSort);
+				}
+				
+				graphs[name] = graphs[name] || {};
+				
+				if (graphs[name][type]) {
+					graphs[name][type].set(data);
+				} else {
+					graphs[name][type] = create(data, type);
+				}
+			};
 
-					countryData.sort(function(a,b) {
-						var sorting = {
-							Others: 1
-						};
-						var cmp = (sorting[a.x] || 0) - (sorting[b.x] || 0);
-
-						if (cmp !== 0) {
-							return cmp;
+			var pollForMoreData = function() {
+				$.getJSON('http://10.0.1.30:8008/v/freeall?period=30s&window=120m', function(data) {
+					for (var name in data) {
+						/*for (var type in data[name]) {
+							console.log(name, type)
+							if (data[name][type]) {
+								insertData(data[name][type], name, type);
+							}
+						}*/
+						if (data[name].bar) {
+							insertData(data[name].bar, name, 'bar');
 						}
-
-						return b.y - a.y;
-					});
-					userData.sort(function(a,b) {
-						return a.x - b.x;
-					});
-
-					countries.set(countryData);
-					users.set(userData);
+						if (data[name].trend) {
+							insertData(data[name].trend, name, 'trend');
+						}
+						if (data[name].line) {
+							insertData(data[name].line, name, 'line');
+						}
+					}
 				});
-			}
+			};
 
-			pollForMoreData();
-			setInterval(pollForMoreData, 1000);
+			$(function() {
+				pollForMoreData();
+				setInterval(pollForMoreData, 1000);
+			});		
 		</script>
 	</head>
 	<body>
 		<h1>Vizard Graphs</h1>
-		<div id="countries" class="left"></div>
-		<div id="users" class="left"></div>
 	</body>
 </html>
+
