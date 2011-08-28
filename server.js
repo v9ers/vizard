@@ -268,7 +268,7 @@ server.get('/v/{id}/{*}?', jsonify(function(request, respond) {
 			var name = w && w.split(',');	
 			var result = {};
 
-			name = name.map(function(n) {
+			name = name && name.map(function(n) {
 				n = n.split(':');
 
 				if (n[1]) {
