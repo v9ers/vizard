@@ -105,7 +105,7 @@
 			var hash = location.pathname.replace('/g', '').substring(1);
 
 			var pollForMoreData = function() {
-				$.getJSON('http://109.74.206.232:8008/v/'+hash+'?period=30s', function(data) {
+				$.getJSON('/v/'+hash+'?period=30s', function(data) {
 					for (var name in data) {
 						/*for (var type in data[name]) {
 							console.log(name, type)
