@@ -10,9 +10,9 @@
 			}
 			.graph {
 				display: inline-block;
-				margin: 20px;
+				margin: 10px 20px;
 				width: 300px;
-				height: 150px;
+				height: 200px;
 			}
 			.left {
 			}
@@ -39,9 +39,13 @@
 
 				$('body').append(html);
 				
-				if (type in {'bar':1, 'trend':1}) {
+				if (type in {'bar':1, 'trend':1, 'histogram':1}) {
 					type = 'column';
 				}
+				if (type in {'choice':1}) {
+					type = 'pie';
+				}
+
 				var graph = vizard.create(id, title, subtitle, type);
 
 				graph.set(data);
@@ -70,13 +74,13 @@
 				return a.x.toUpperCase().localeCompare(b.x.toUpperCase());
 			};			
 			var insertData = function(data, name, type) {
-				if (type === 'line') {
+				if (type in {'line':1,'histogram':1}) {
 					data.sort(lineSort);
 					/*data[set].line.forEach(function(item) {
 						item.x = new Date(item.x).toUTCString();
 					});*/
 				}
-				if (type in {'bar':1, 'trend':1}) {
+				if (type in {'bar':1, 'trend':1, 'choice':1}) {
 					if (typeof data !== 'object') {
 						return;
 					}
@@ -115,6 +119,12 @@
 						}
 						if (data[name].line) {
 							insertData(data[name].line, name, 'line');
+						}
+						if (data[name].histogram) {
+							insertData(data[name].histogram, name, 'histogram');
+						}
+						if (data[name].choice) {
+							insertData(data[name].choice, name, 'choice');
 						}
 					}
 				});

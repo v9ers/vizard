@@ -27,6 +27,7 @@
 					xAxis: {
 						categories: firstData.categories,
 						labels: {
+							enabled: (subtitle !== 'histogram'),
 							step: (type === 'line' ? 4 : null)
 						}
 					},
@@ -38,13 +39,16 @@
 					},
 					plotOptions: {
 						column: {
-							pointPadding: 0.2,
-							borderWidth: 0
+							pointPadding: (subtitle === 'histogram' ? 0.04 : 0.2),
+	            groupPadding: 0,
+							borderWidth: 0,
+							shadow: (subtitle !== 'histogram')
 						}
 					},
 					tooltip: {
 						formatter: function() {
-							return this.x + ' : <b>' + this.y + '</b>';
+							var name = this.x || (this.point && this.point.name);
+							return (name ? name + ' : ' : '') + '<b>' + this.y + '</b>';
 						}
 					},
 					series: [{
@@ -71,17 +75,14 @@
 				}
 
 				for (var i=firstPoint; i<data.length; i++) {
-					mustRedraw = true;
+					var shiftOffOldPoints = (chart.xAxis[0].categories.length > data.length);
+					chart.series[0].addPoint({name:data[i].x, y:data[i].y}, false, shiftOffOldPoints, true);
 					chart.xAxis[0].categories.push(data[i].x);
-
-					if (chart.xAxis[0].categories.length > data.length) {
-						chart.series[0].addPoint({name:data[i].x, y:data[i].y}, false, true, true);
-					} else {
-						chart.series[0].addPoint({name:data[i].x, y:data[i].y}, false, false, true);
-					}
+					mustRedraw = true;
 				}
 
 				if (mustRedraw) {
+					chart.xAxis[0].options.labels.step = (data.length / 2) | 0;
 					chart.redraw();
 				}
 			};
@@ -145,7 +146,7 @@
 						return;
 					}
 
-					if (type === 'line') {
+					if (type in {'line':1, 'pie':1}) {
 						renderLine(data);
 					}
 
