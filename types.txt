@@ -1,0 +1,11 @@
++     bar
++     line
++     histogram
++     choice
++     trend(map)
+-     trend(integer)
+-     total
+-     min
+-     max
+-     average
+-     std
