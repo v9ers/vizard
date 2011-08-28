@@ -211,7 +211,11 @@ server.post('/r/{id}', jsonify(function(request, data, respond) {
 }));
 
 server.get('/r/{id}', jsonify(function(request, respond) {
-	db.series.find({id:request.params.id}, {_id:0}, fork(respond));
+	var query = parseURL(request.url, true).query;
+	var from = query.from && parseInt(query.from, 10);
+	var window = from || (Date.now() - parseTime(query.window || '1w'));
+	
+	db.series.find({id:request.params.id, time:{$gte:window}}, {_id:0}, fork(respond));
 }));
 
 server.get('/v/{id}/{name}?', jsonify(function(request, respond) {
