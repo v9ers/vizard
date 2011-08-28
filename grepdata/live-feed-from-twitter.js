@@ -6,7 +6,7 @@ var interval = 35;
 var vizardNames = {
 	error:    'bjarke-error',
 	response: 'bjarke-twitter-response',
-	result:   'words-from-twitter'
+	result:   'twitter-irene'
 };
 
 var ANSI_NORMAL = '\u001B[0m';
@@ -62,7 +62,7 @@ var searchTwitterAndPostToVizard = (function() {
 					vizard.post(vizardNames.result, {
 						language: result.iso_language_code,
 						word: word,
-						messages: messageCount
+						"word count": 1
 					});
 				});
 			});
