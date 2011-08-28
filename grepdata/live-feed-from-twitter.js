@@ -2,11 +2,11 @@ var twitter = require('./twitter-client');
 var vizard  = require('./vizard-client');
 
 // Config stuff.
-var interval = 5;
+var interval = 35;
 var vizardNames = {
 	error:    'bjarke-error',
 	response: 'bjarke-twitter-response',
-	result:   'bjarke-twitter-result'
+	result:   'words-from-twitter'
 };
 
 var ANSI_NORMAL = '\u001B[0m';
@@ -23,6 +23,7 @@ console.log(ANSI_NORMAL + 'Searching for "' + ANSI_BOLD + query + ANSI_NORMAL
 
 var searchTwitterAndPostToVizard = (function() {
 	var oldResultIds = {};
+	var badWords = { 'the': 1, 'and': 1, 'you': 1, 'http': 1 };
 
 	return function() {
 		twitter.search(query, function(err, response) {
@@ -45,7 +46,21 @@ var searchTwitterAndPostToVizard = (function() {
 			});
 			vizard.post(vizardNames.response, response);
 			results.forEach(function(result) {
-				vizard.post(vizardNames.result, result);
+
+				var text = result.text.replace(/('|http:\/\/\S+)/g, '');
+
+				var words = text.split(/\W+/g).filter(function(word) {
+					return !!word && word.length > 2 && !(word.toLowerCase() in badWords);
+				}).map(function(word) {
+					return word.toLowerCase();
+				});
+
+				words.forEach(function(word) {
+					vizard.post(vizardNames.result, {
+						language: result.iso_language_code,
+						word: word
+					});
+				});
 			});
 		});
 	};
