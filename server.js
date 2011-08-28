@@ -9,7 +9,7 @@ var fs = require('fs');
 
 var notify = common.createEmitter();
 
-var analyzor = function() {
+var analyzor = function(key) {
 	var that = {};
 
 	var addLine = function(line, data, options) {
