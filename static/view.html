@@ -24,7 +24,7 @@
 		var hash = location.pathname.replace('/g', '').substring(1);
 		
 		var parseId = function(url) {
-		    matches = url.match(/\/g\/([^?#\/]+)/);
+		    matches = url.match(/\/(?:g\/)?([^?#\/]+)/);
 		    if (matches) {
 		        return matches[1];
 		    }
@@ -227,7 +227,7 @@
 		<div class="container head">
 			<div class="row" style='margin-top: 6px;'>
 				<div class='twelvecol last'>
-					<div style='text-align:right; padding-right:20px'><a id='rawdata' href=''>Raw data</a></div>
+					<div style='text-align:right; padding-right:20px'><a style='display:none' id='rawdata' href=''>Raw data</a></div>
 				</div>
 			</div>
 		</div>
