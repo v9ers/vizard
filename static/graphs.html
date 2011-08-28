@@ -18,8 +18,8 @@
 			}
 		</style>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script> 
-		<script type="text/javascript" src="js/highcharts.src.js"></script>
-		<script type="text/javascript" src="js/vizard.js"></script>
+		<script type="text/javascript" src="/s/js/highcharts.src.js"></script>
+		<script type="text/javascript" src="/s/js/vizard.js"></script>
 		<script>
 			var gensym = (function() {
 				var i=0;
@@ -102,8 +102,10 @@
 				}
 			};
 
+			var hash = location.pathname.replace('/g', '').substring(1);
+
 			var pollForMoreData = function() {
-				$.getJSON('http://10.0.1.30:8008/v/freeall?period=30s', function(data) {
+				$.getJSON('http://109.74.206.232:8008/v/'+hash+'?period=30s', function(data) {
 					for (var name in data) {
 						/*for (var type in data[name]) {
 							console.log(name, type)

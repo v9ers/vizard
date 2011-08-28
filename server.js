@@ -5,6 +5,9 @@ var common = require('common');
 var parseURL = require('url').parse;
 var stats = require('./stats');
 var nko = require('nko')('2Fv892xsR2NIoRAq');
+var fs = require('fs');
+
+var notify = common.createEmitter();
 
 var analyzor = function() {
 	var that = {};
@@ -206,8 +209,15 @@ server.post('/r/{id}', jsonify(function(request, data, respond) {
 	data.time = data.time || Date.now();
 
 	db.series.save(data, fork(respond, function() {
+		notify.emit(data.id);
 		respond({success:true});
 	}));
+}));
+
+server.get('/n/{id}', jsonify(function(request, respond) {
+	notify.once(request.params.id, function() {
+		respond({success:true});	
+	});
 }));
 
 server.get('/r/{id}', jsonify(function(request, respond) {
@@ -242,11 +252,19 @@ server.get('/v/{id}/{name}?', jsonify(function(request, respond) {
 				}
 				for (var i in map) {
 					if (Array.isArray(map[i])) {
-						result[i] = map[i];
-						result[i].forEach(function(r, j) {
-							result[i][j] = flatten(r);
-						});
+						map[i].forEach(function(el) {
+							el = flatten(el);
 
+							if (typeof el === 'object') {
+								for (var j in el) {
+									result[i+'.'+j] = result[i+'.'+j] || [];
+									result[i+'.'+j].push(el[j]);
+								}
+							} else {
+								result[i] = result[i] || [];
+								result[i].push(el);
+							}
+						});
 					} else if (typeof map[i] === 'object') {
 						var sub = flatten(map[i]);
 
@@ -283,5 +301,27 @@ server.get('/v/{id}/{name}?', jsonify(function(request, respond) {
 		}
 	], fork(respond));
 }));
+
+server.get('/s/*', function(request, response) {
+	// security blah blah - use lib
+	fs.readFile('./static/'+request.params.wildcard, function(err, res) {
+		response.writeHead(err ? 404 : 200);
+		response.end(res);
+	});
+});
+server.get('/{id}', '/g/{id}', server.route);
+server.get('/g/{id}', function(request, response) {
+	var onerror = function() {
+		response.writeHead(500);
+		response.end('oh no');
+	};
+
+	db.series.findOne({id:request.params.id}, function(err, exists) {
+		fs.readFile(exists ? './static/graphs.html' : './static/add.html', common.fork(onerror, function(buf) {
+			response.writeHead(200);
+			response.end(buf);
+		}));
+	});
+});
 
 server.listen(8008);
