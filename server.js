@@ -9,7 +9,7 @@ var fs = require('fs');
 
 var notify = common.createEmitter();
 
-var analyzor = function(key) {
+var analyzor = function(key, view) {
 	var that = {};
 
 	var addLine = function(line, data, options) {
@@ -20,6 +20,17 @@ var analyzor = function(key) {
 		} else {
 			last.y += data;
 		}
+	};
+	var viewer = function(that) {
+		if (!view.length) {
+			return that;
+		}
+		['histogram', 'line', 'choice', 'trend', 'bar'].forEach(function(name) {
+			if (view.indexOf(name) === -1) {
+				delete that[name];
+			}			
+		});
+		return that;
 	};
 	var add = function(data, options) {
 		if (data === null || data === undefined) {
@@ -67,15 +78,15 @@ var analyzor = function(key) {
 					return entry.x;
 				});
 
+				that.histogram = stats.histogram(y);
 				that.min = stats.min(y, x);
 				that.max = stats.max(y, x);
 				that.average = round(stats.average(y));
 				that.std = round(stats.std(y));
-				that.histogram = stats.histogram(y);
 				that.name = key;
 				that.type = typeof data;
 
-				return that;
+				return viewer(that);
 			};
 		}
 		if (typeof data === 'boolean') {
@@ -99,7 +110,7 @@ var analyzor = function(key) {
 				for (var i in line) {
 					line[i].y = line[i].y >= 0;
 				}
-				return that;
+				return viewer(that);
 			};
 		}
 		if (typeof data === 'string') {
@@ -154,7 +165,7 @@ var analyzor = function(key) {
 				that.name = key;
 				that.type = typeof data;
 				
-				return that;
+				return viewer(that);
 			};
 		}
 		if (typeof data === 'object') {
@@ -220,7 +231,7 @@ server.post('/r/{id}', jsonify(function(request, data, respond) {
 	}));
 }));
 
-server.get('/n/{id}', jsonify(function(request, respond) {
+server.get('/n/{id}/{*}?', jsonify(function(request, respond) {
 	notify.once(request.params.id, function() {
 		respond({success:true});	
 	});
@@ -234,7 +245,7 @@ server.get('/r/{id}', jsonify(function(request, respond) {
 	db.series.find({id:request.params.id, time:{$gte:window}}, {_id:0}, fork(respond));
 }));
 
-server.get('/v/{id}/{name}?', jsonify(function(request, respond) {
+server.get('/v/{id}/{*}?', jsonify(function(request, respond) {
 	var query = parseURL(request.url, true).query;
 	var from = query.from && parseInt(query.from, 10);
 	var window = from || (Date.now() - parseTime(query.window || '1w'));
@@ -251,8 +262,22 @@ server.get('/v/{id}/{name}?', jsonify(function(request, respond) {
 				return;
 			}
 
-			var name = request.params.name;
+			var views = {};
+
+			var w = request.params['*'];
+			var name = w && w.split(',');	
 			var result = {};
+
+			name = name.map(function(n) {
+				n = n.split(':');
+
+				if (n[1]) {
+					views[n[0]] = views[n[0]] || [];
+					views[n[0]].push(n[1]);
+				}
+
+				return n[0];
+			});
 
 			var flatten = function(map) {
 				var result = {};
@@ -291,7 +316,7 @@ server.get('/v/{id}/{name}?', jsonify(function(request, respond) {
 			series.forEach(function(serie) {
 				serie = flatten(serie);
 
-				var keys = name ? [name] : Object.keys(serie);
+				var keys = name ? [].concat(name) : Object.keys(serie);
 
 				keys.forEach(function(key) {
 					if (key === 'time' || key === 'id') {
@@ -301,7 +326,7 @@ server.get('/v/{id}/{name}?', jsonify(function(request, respond) {
 						return;
 					}
 					var s = serie[key];
-					var analyse = result[key] = result[key] || analyzor(key, s);
+					var analyse = result[key] = result[key] || analyzor(key, views[key] || []);
 
 					analyse.push(s, {time:serie.time, period:period, trend:trend});
 				});

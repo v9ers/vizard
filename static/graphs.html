@@ -104,37 +104,44 @@
 
 			var hash = location.pathname.replace('/g', '').substring(1);
 
-			var pollForMoreData = function() {
-				$.getJSON('/v/'+hash+'?period=30s', function(data) {
-					for (var name in data) {
-						/*for (var type in data[name]) {
-							console.log(name, type)
-							if (data[name][type]) {
-								insertData(data[name][type], name, type);
+			var pollForMoreData = function(force) {
+				var go = function() {
+										$.getJSON('/v/'+hash+'?period=30s', function(data) {
+						for (var name in data) {
+							/*for (var type in data[name]) {
+								console.log(name, type)
+								if (data[name][type]) {
+									insertData(data[name][type], name, type);
+								}
+							}*/
+							if (data[name].bar) {
+								insertData(data[name].bar, name, 'bar');
 							}
-						}*/
-						if (data[name].bar) {
-							insertData(data[name].bar, name, 'bar');
+							if (data[name].trend) {
+								insertData(data[name].trend, name, 'trend');
+							}
+							if (data[name].line) {
+								insertData(data[name].line, name, 'line');
+							}
+							if (data[name].histogram) {
+								insertData(data[name].histogram, name, 'histogram');
+							}
+							if (data[name].choice) {
+								insertData(data[name].choice, name, 'choice');
+							}
 						}
-						if (data[name].trend) {
-							insertData(data[name].trend, name, 'trend');
-						}
-						if (data[name].line) {
-							insertData(data[name].line, name, 'line');
-						}
-						if (data[name].histogram) {
-							insertData(data[name].histogram, name, 'histogram');
-						}
-						if (data[name].choice) {
-							insertData(data[name].choice, name, 'choice');
-						}
-					}
-				});
+						setTimeout(pollForMoreData, 1000);
+					});
+				}
+				if (force) {
+					go();
+					return;
+				}
+				$.get('/n/'+hash, go);				
 			};
 
 			$(function() {
-				pollForMoreData();
-				setInterval(pollForMoreData, 1000);
+				pollForMoreData(true);
 			});		
 		</script>
 	</head>
