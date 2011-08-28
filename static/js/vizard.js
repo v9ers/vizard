@@ -8,7 +8,7 @@
 					chart: {
 						renderTo: id,
 						defaultSeriesType: type,
-						backgroundColor: 'transparent'
+						backgroundColor: 'rgba(0,0,0,0)'
 					},
 					colors: ['#2B4E72', '#2790B0', '#94BA65', '#353432', '#38936F', '#FFA600', '#AE324C', '#D5D638', '#884FA2'],
 					credits: {
