@@ -2,14 +2,19 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>Vizard Graphs</title>
+		<title>Vizard Dashboard</title>
 		<style>
+			body {
+				text-align: center;
+				margin: 40px;
+			}
 			.graph {
+				display: inline-block;
+				margin: 20px;
 				width: 300px;
 				height: 150px;
 			}
 			.left {
-				float: left;
 			}
 		</style>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script> 
@@ -26,8 +31,10 @@
 			
 			var graphs = {};
 
-			var create = function(data, type) {
+			var create = function(data, name, type) {
 				var id = gensym();
+				var title = name;
+				var subtitle = type;
 				var html = '<div class="left graph" id="'+id+'"></div>';
 
 				$('body').append(html);
@@ -35,7 +42,7 @@
 				if (type in {'bar':1, 'trend':1}) {
 					type = 'column';
 				}
-				var graph = vizard.create(id, type);
+				var graph = vizard.create(id, title, subtitle, type);
 
 				graph.set(data);
 				
@@ -70,6 +77,9 @@
 					});*/
 				}
 				if (type in {'bar':1, 'trend':1}) {
+					if (typeof data !== 'object') {
+						return;
+					}
 					var realData = [];
 					
 					for (var i in data) {
@@ -84,12 +94,12 @@
 				if (graphs[name][type]) {
 					graphs[name][type].set(data);
 				} else {
-					graphs[name][type] = create(data, type);
+					graphs[name][type] = create(data, name, type);
 				}
 			};
 
 			var pollForMoreData = function() {
-				$.getJSON('http://10.0.1.30:8008/v/freeall?period=30s&window=120m', function(data) {
+				$.getJSON('http://10.0.1.30:8008/v/freeall?period=30s', function(data) {
 					for (var name in data) {
 						/*for (var type in data[name]) {
 							console.log(name, type)
@@ -117,7 +127,6 @@
 		</script>
 	</head>
 	<body>
-		<h1>Vizard Graphs</h1>
 	</body>
 </html>
 

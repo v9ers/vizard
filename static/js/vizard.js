@@ -1,5 +1,5 @@
 (function(exports) {
-		exports.create = function(id, type) {
+		exports.create = function(id, title, subtitle, type) {
 			var chart;
 			var firstData = {
 				categories: [],
@@ -19,7 +19,10 @@
 						enabled: false
 					},
 					title: {
-						text: ''
+						text: title
+					},
+					subtitle: {
+						text: subtitle
 					},
 					xAxis: {
 						categories: firstData.categories,
