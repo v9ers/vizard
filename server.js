@@ -9,7 +9,7 @@ var fs = require('fs');
 
 var notify = common.createEmitter();
 
-var analyzor = function() {
+var analyzor = function(key) {
 	var that = {};
 
 	var addLine = function(line, data, options) {
@@ -332,6 +332,6 @@ server.get('/g/*', function(request, response) {
 		}));
 	});
 });
-server.get('/*', '/g/*', server.route);
+server.get('/*', '/g/{*}', server.route);
 
 server.listen(80);
