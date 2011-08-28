@@ -3,14 +3,14 @@
 		<title>Vizard</title>
 		<meta name='viewport' content='width=device-width, initial-scale=1.0' /> 
 
-		<!--[if lte IE 9]><link rel='stylesheet' href='css/ie.css' type='text/css' media='screen' /><![endif]--> 
-		<link rel='stylesheet' href='css/1140.css' type='text/css' media='screen' /> 
+		<!--[if lte IE 9]><link rel='stylesheet' href='/s/css/ie.css' type='text/css' media='screen' /><![endif]--> 
+		<link rel='stylesheet' href='/s/css/1140.css' type='text/css' media='screen' /> 
 		<style>
 			html, body {
 				font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 				font-size: 14px;
 				margin-top: 30px;
-				background-image: url(images/body.gif);
+				background-image: url(/s/images/body.gif);
 			}
 			.header {
 				font-size: 34px;
@@ -56,14 +56,14 @@
 			}
 			.boxy {
 				padding: 10px;
-				background-image: url(images/body.gif);
+				background-image: url(/s/images/body.gif);
 				margin: 10px 0;
 			}
 			.strikeout {
 				text-decoration: line-through;
 			}
 		</style>
-		<script src='js/jquery-1.6.2.min.js'></script>
+		<script src='/s/js/jquery-1.6.2.min.js'></script>
 	</head>
 	<body>
 		<div class='container'>
@@ -91,8 +91,9 @@
 				<div class='fourcol last box'>
 					<h2>Examples</h2>
 					<div class='inner'>
-						<a href='http://109.74.206.232/twitter-irene/messages?period=1m&window=2h'>Irene on Twitter</a> - The number of tweets with the hashtag #irene. Accumulated for every 10 minutes<br><br>
-						<a href='http://109.74.206.232/g/twitter/trends.name:bar'>Trending hashtags</a> - See the most trending hashtags on Twitter over the last 10 minutes.<br><br>
+						<a href='http://v9-ers.nko2.nodeknockout.com/twitter-irene/messages?period=1m&window=2h'>Irene on Twitter</a> - The number of tweets with the hashtag #irene. Accumulated for every 10 minutes<br><br>
+						<a href='http://v9-ers.nko2.nodeknockout.com/g/twitter/trends.name:bar'>Trending hashtags</a> - See the most trending hashtags on Twitter over the last 10 minutes.<br><br>
+						<a href='http://v9-ers.nko2.nodeknockout.com/g/movies'>Fake movie data</a> - An example about fake data being posted to the server.<br><br>
 					</div>
 				</div>
 			</div>
@@ -106,7 +107,7 @@
 							First post some data. You can do this with curl.
 							<div class='boxy'>
 								<div class='code'>
-									%> curl -X POST --data '{"foo":"bar", "somenumber":42}' http://109.74.206.232/r/nodeknockout
+									%> curl -X POST --data '{"foo":"bar", "somenumber":42}' http://v9-ers.nko2.nodeknockout.com/r/nodeknockout
 								</div>
 								<div class='note'>
 									Instead of nodeknockout you can write something else. Use your imagination.
@@ -115,7 +116,7 @@
 
 							Now open this page in the browser
 							<div class='boxy code'>
-								<a href='http://109.74.206.232/nodeknockout' target='_blank'>http://109.74.206.232/nodeknockout</a>
+								<a href='http://v9-ers.nko2.nodeknockout.com/nodeknockout' target='_blank'>http://v9-ers.nko2.nodeknockout.com/nodeknockout</a>
 								<div class='note'>
 									Obviously... this should match whatever name you chose before.
 								</div>
@@ -142,6 +143,7 @@
 									
 								</div>
 							</div>
+						<a href='http://v9-ers.nko2.nodeknockout.com/g/twitter/trends.name:bar'>Trending hashtags</a> - See the most trending hashtags on Twitter over the last 10 minutes.<br><br>
 
 							Open an example page, and follow the tutorial
 							<div class='boxy code'>
@@ -160,7 +162,7 @@
 							we had to the server.
 						</div>
 						<div>
-							<h3>Twitter tags</h3>
+							<h3>From</h3>
 							<a href='http://twitter.com/mafintosh'>@mafintosh</a><br>
 							<a href='http://twitter.com/ianjorgensen'>@ianjorgensen</a><br>
 							<a href='http://twitter.com/tobiasbaunbaek'>@tobiasbaunbaek</a><br>
