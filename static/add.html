@@ -1,0 +1,26 @@
+<html>
+<head>
+	<title>vizard</title>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script> 
+	<script>
+		var id = window.location.pathname.replace('/v', '');
+
+		id = id.substring(1);
+
+		$(function() {
+			$('pre').text($('pre').text().replace('$id', id));
+		})
+
+		setTimeout(function() {
+			$.get('/n/'+id, function() {
+				window.location = '/g'+window.location.pathname
+			});
+		}, 100);
+	</script>
+</head>
+<body>
+	<h1>sup brah</h1>
+	 <p>space is empty - why dont you add a data source?</p>
+	try to post some data to <pre>http://109.74.206.232:8008/r/$id</pre>
+</body>
+</html>
