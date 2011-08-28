@@ -24,10 +24,10 @@ var analyzor = function() {
 		}
 		if (typeof data === 'number') {
 			var line = [];
+			var last;
 			var y = [];
 			var x = [];
 
-			that.graph = {line:line};
 			that.total = 0;
 
 			add = function(data, options) {
@@ -35,6 +35,8 @@ var analyzor = function() {
 
 				y.push(data);
 				x.push(options.time);
+
+				last = options.time;
 
 				addLine(line, data, options);
 			};
@@ -44,12 +46,29 @@ var analyzor = function() {
 			};
 
 			that.toJSON = function() {
-				that.trend = round(stats.trend(y,x,options.period));
+				var limit = last-options.trend;
+				var i = x.length-1;
+				
+				for (; i > 0 && x[i] >= limit; i--);
+
+				x = x.slice(i);
+				y = y.slice(i);
+
+				that.line = line;
+				that.trend = round(stats.trend(y,x));
+
+				y = line.map(function(entry) {
+					return entry.y;
+				});
+				x = line.map(function(entry) {
+					return entry.x;
+				});
+
 				that.min = stats.min(y, x);
 				that.max = stats.max(y, x);
 				that.average = round(stats.average(y));
 				that.std = round(stats.std(y));
-				that.graph.histogram = stats.histogram(y);
+				that.histogram = stats.histogram(y);
 
 				return that;
 			};
@@ -57,8 +76,6 @@ var analyzor = function() {
 		if (typeof data === 'boolean') {
 			var choice = {yes:0, no:0};
 			var line = [];
-
-			that.graph = {choice:choice, line:line};
 
 			add = function(data, options) {
 				addLine(line, data ? 1 : -1, options);
@@ -69,6 +86,9 @@ var analyzor = function() {
 			};
 
 			that.toJSON = function() {
+				that.choice = choice;
+				that.line = line;
+
 				for (var i in line) {
 					line[i].y = line[i].y >= 0;
 				}
@@ -79,8 +99,6 @@ var analyzor = function() {
 			var bar = {};
 			var all = [];
 			var last = 0;
-
-			that.graph = {bar:bar};
 
 			var digest = function(values) {
 				var top = Object.keys(values);
@@ -118,13 +136,13 @@ var analyzor = function() {
 
 			that.toJSON = function() {
 				var trend = {};
-				var limit = last-options.period;
+				var limit = last-options.trend;
 
 				for (var i = all.length-1; i >= 0 && all[i][1] >= limit; i--) {
 					put(trend, all[i][0]);
 				}
 
-				that.graph.bar = digest(bar);
+				that.bar = digest(bar);
 				that.trend = digest(trend);
 
 				return that;
@@ -132,7 +150,7 @@ var analyzor = function() {
 		}
 		if (typeof data === 'object') {
 			add = function(data, options) {
-				
+
 			};
 		}
 
@@ -198,24 +216,53 @@ server.get('/r/{id}', jsonify(function(request, respond) {
 
 server.get('/v/{id}/{name}?', jsonify(function(request, respond) {
 	var query = parseURL(request.url, true).query;
-	var from = parseInt(query.from, 10);
+	var from = query.from && parseInt(query.from, 10);
 	var window = from || (Date.now() - parseTime(query.window || '1w'));
 	var period = parseTime(query.period || '5m');
+	var trend = parseTime(query.trend || query.period);
 
 	common.step([
 		function(next) {
-			db.series.find({id:request.params.id, time:{$gte:window}}, {_id:0}, next);
+			db.series.find({id:request.params.id, time:{$gte:window}}, {_id:0}).sort({time:1}, next);
 		},
 		function(series) {
 			if (!series.length) {
-				respond(404, {});
+				respond({});
 				return;
 			}
 
 			var name = request.params.name;
 			var result = {};
 
+			var flatten = function(map) {
+				var result = {};
+
+				if (typeof map !== 'object') {
+					return map;
+				}
+				for (var i in map) {
+					if (Array.isArray(map[i])) {
+						result[i] = map[i];
+						result[i].forEach(function(r, j) {
+							result[i][j] = flatten(r);
+						});
+
+					} else if (typeof map[i] === 'object') {
+						var sub = flatten(map[i]);
+
+						for (var j in sub) {
+							result[i+'.'+j] = sub[j];
+						}
+					} else {
+						result[i] = map[i];
+					}
+				}
+				return result;
+			};
+
 			series.forEach(function(serie) {
+				serie = flatten(serie);
+
 				var keys = name ? [name] : Object.keys(serie);
 
 				keys.forEach(function(key) {
@@ -225,9 +272,10 @@ server.get('/v/{id}/{name}?', jsonify(function(request, respond) {
 					if (!(key in serie)) {
 						return;
 					}
-					var analyse = result[key] = result[key] || analyzor(key, serie[key]);
+					var s = serie[key];
+					var analyse = result[key] = result[key] || analyzor(key, s);
 
-					analyse.push(serie[key], {time:serie.time, period:period});
+					analyse.push(s, {time:serie.time, period:period, trend:trend});
 				});
 			});
 
