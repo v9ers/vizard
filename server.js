@@ -214,6 +214,7 @@ var fork = function(respond, fn) {
 
 	return function(err, value) {
 		if (err) {
+			console.error(err.stack || err);
 			respond(500, {error:err.message});
 			return;
 		}
