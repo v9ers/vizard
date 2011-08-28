@@ -326,6 +326,6 @@ server.get('/g/*', function(request, response) {
 		}));
 	});
 });
-server.get('/*', '/g/*', server.route);
+server.get('/*', '/g/{*}', server.route);
 
 server.listen(80);
