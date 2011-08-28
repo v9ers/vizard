@@ -1,10 +1,8 @@
 (function(exports) {
 		exports.create = function(id, title, subtitle, type) {
+			console.log(id);
 			var chart;
-			var firstData = {
-				categories: [],
-				values: []
-			};
+			var firstData = [];
 			
 			$(function() {
 				chart = new Highcharts.Chart({
@@ -25,7 +23,7 @@
 						text: subtitle
 					},
 					xAxis: {
-						categories: firstData.categories,
+						categories: firstData.map(function(d) { return d.x; }),
 						labels: {
 							enabled: (subtitle !== 'histogram'),
 							step: (type === 'line' ? 4 : null)
@@ -40,7 +38,7 @@
 					plotOptions: {
 						column: {
 							pointPadding: (subtitle === 'histogram' ? 0.04 : 0.2),
-	            groupPadding: 0,
+							groupPadding: 0,
 							borderWidth: 0,
 							shadow: (subtitle !== 'histogram')
 						}
@@ -52,7 +50,7 @@
 						}
 					},
 					series: [{
-						data: []
+						data: firstData.map(function(d) { return d.y; })
 					}]
 				});
 			});
@@ -138,11 +136,10 @@
 				}
 			};
 			
-			
 			return {
 				set: function(data) {
 					if (!chart) {
-						firstData = data;
+						console.error('Please do not set data before the chart is initialized!');
 						return;
 					}
 

@@ -72,6 +72,8 @@ var analyzor = function() {
 				that.average = round(stats.average(y));
 				that.std = round(stats.std(y));
 				that.histogram = stats.histogram(y);
+				that.name = key;
+				that.type = typeof data;
 
 				return that;
 			};
@@ -91,6 +93,8 @@ var analyzor = function() {
 			that.toJSON = function() {
 				that.choice = choice;
 				that.line = line;
+				that.name = key;
+				that.type = typeof data;
 
 				for (var i in line) {
 					line[i].y = line[i].y >= 0;
@@ -147,7 +151,9 @@ var analyzor = function() {
 
 				that.bar = digest(bar);
 				that.trend = digest(trend);
-
+				that.name = key;
+				that.type = typeof data;
+				
 				return that;
 			};
 		}
