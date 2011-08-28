@@ -1,0 +1,174 @@
+<html>
+	<head>
+		<title>Vizard</title>
+		<meta name='viewport' content='width=device-width, initial-scale=1.0' /> 
+
+		<!--[if lte IE 9]><link rel='stylesheet' href='css/ie.css' type='text/css' media='screen' /><![endif]--> 
+		<link rel='stylesheet' href='css/1140.css' type='text/css' media='screen' /> 
+		<style>
+			html, body {
+				font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+				font-size: 14px;
+				margin-top: 30px;
+				background-image: url(images/body.gif);
+			}
+			.header {
+				font-size: 34px;
+				font-weight: bold;
+				text-align: center;
+				margin-bottom: 30px;
+			}
+			.header .subtitle {
+				font-size: 20px;
+				font-style: italic;
+				font-weight: normal;
+				color: #aaa;
+			}
+			.header .subtitle.oreilly {
+				font-size: 17px;
+			}
+			.box {
+				background-color: #ccc;
+				width: 100%;
+				padding: 20px 0;
+			}
+			.box h2 {
+				text-align: center;
+			}
+			.box .inner {
+				padding: 10px 25px;
+			}
+			.box.big .inner {
+				padding: 20px 40px;
+			}
+			.code {
+				font-family: monospace;
+				font-size: 12px;
+			}
+			.note {
+				margin-top:5px;
+				color: #888;
+				font-size: 12px;
+				font-style: italic;
+			}
+			h3 {
+				margin: 20px 0 10px 0;
+			}
+			.boxy {
+				padding: 10px;
+				background-image: url(images/body.gif);
+				margin: 10px 0;
+			}
+			.strikeout {
+				text-decoration: line-through;
+			}
+		</style>
+		<script src='js/jquery-1.6.2.min.js'></script>
+	</head>
+	<body>
+		<div class='container'>
+			<div class='row'>
+				<div class='fourcol'></div> 
+				<div class='fourcol last header'>
+					<div>Vizard</div>
+					<div class='subtitle'>JSON goes in - graphs come out</div>
+					<div class='subtitle oreilly'>(you can't explain that)</div>
+				</div> 
+			</div>
+			<div class='row'>
+				<div class='twocol'></div>
+				<div class='fourcol'>
+					<div>
+						Vizard is an easy way to visualize your data - in realtime.<br><br>
+						Send JSON data to the server, open up the corresponding display page and see your data. The page is updated in realtime when new data is posted.<br><br>
+						A great alternative to building your own complicated infrastructure to visualize the data you have. Simply post it to the server and see it.
+						<br><br>
+						<div style='text-align:center'>
+							<iframe src="http://nodeknockout.com/iframe/v9-ers" frameborder=0 scrolling=no allowtransparency=true width=115 height=25></iframe>
+						</div>
+					</div>
+				</div>
+				<div class='fourcol last box'>
+					<h2>Examples</h2>
+					<div class='inner'>
+						<a href='http://109.74.206.232/twitter-irene/messages?period=1m&window=2h'>Irene on Twitter</a> - The number of tweets with the hashtag #irene. Accumulated for every 10 minutes<br><br>
+						<a href='http://109.74.206.232/g/twitter/trends.name:bar'>Trending hashtags</a> - See the most trending hashtags on Twitter over the last 10 minutes.<br><br>
+					</div>
+				</div>
+			</div>
+			<div class='row' style='margin-top:20px'>
+				<div class='twocol'></div>
+				<div class='eightcol box big last'>
+					<h2>Installation guide</h2>
+					<div class='inner'>
+						<div>
+							<h3>1. Try it out online</h3>
+							First post some data. You can do this with curl.
+							<div class='boxy'>
+								<div class='code'>
+									%> curl -X POST --data '{"foo":"bar", "somenumber":42}' http://109.74.206.232/r/nodeknockout
+								</div>
+								<div class='note'>
+									Instead of nodeknockout you can write something else. Use your imagination.
+								</div>
+							</div>
+
+							Now open this page in the browser
+							<div class='boxy code'>
+								<a href='http://109.74.206.232/nodeknockout' target='_blank'>http://109.74.206.232/nodeknockout</a>
+								<div class='note'>
+									Obviously... this should match whatever name you chose before.
+								</div>
+							</div>
+
+							That's it! You see the first data online. Try to post some more data, change
+							numbers, and generally play around with it.<br><br>
+						</div>
+						<div>
+							<h3>2. Download the source</h3>
+
+							As anyone else we <span class='strikeout'>were forced to</span> use Github. Feel free to fork the project if you want to.
+							<div class='boxy code'>
+								<a href='https://github.com/v9ers/vizard' target='_blank'>Git repository</a>
+							</div>
+						</div>
+						<div>
+							<h3>3. Run locally</h3>
+
+							First start the server. It will open on
+							<div class='boxy code'>
+								%> node server.js
+								<div class='note'>
+									
+								</div>
+							</div>
+
+							Open an example page, and follow the tutorial
+							<div class='boxy code'>
+								<a href='http://localhost:8008/nodeknockout' target='_blank'>
+									Open localhost:8008/nodeknockout
+								</a>
+							</div>
+						</div>
+						<div>
+							<h3>Notes</h3>
+							One of the best examples of Vizard is to use it on your own server with internal data.
+							It's a great way to easily visualize data without having to built a big infrastructure.
+							<br><br>
+							In the weekend we have built this we have used it to visualize our own dat on a service
+							we run, and it helped us to easily identify a few pitfalls. Just by sending the JSON data
+							we had to the server.
+						</div>
+						<div>
+							<h3>Twitter tags</h3>
+							<a href='http://twitter.com/mafintosh'>@mafintosh</a><br>
+							<a href='http://twitter.com/ianjorgensen'>@ianjorgensen</a><br>
+							<a href='http://twitter.com/tobiasbaunbaek'>@tobiasbaunbaek</a><br>
+							<a href='http://twitter.com/walling'>@walling</a><br>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div> 
+	</body>
+</html>
