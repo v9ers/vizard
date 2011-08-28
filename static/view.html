@@ -31,9 +31,10 @@
 		    return '';
 		};
 
+
 		var load = function(force) {
 			var go = function() {
-				$.getJSON('http://109.74.206.232/v/'+hash+'?window=1d&period=5m', function(data) {
+				$.getJSON('http://109.74.206.232/v/'+hash+(window.location.search || '?window=1d&period=5m'), function(data) {
 					for (var name in data) {
 						var prop = data[name];
 						prop.title = name;
