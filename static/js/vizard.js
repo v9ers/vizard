@@ -1,6 +1,5 @@
 (function(exports) {
 		exports.create = function(id, title, subtitle, type) {
-			console.log(id);
 			var chart;
 			var firstData = [];
 			
@@ -8,8 +7,10 @@
 				chart = new Highcharts.Chart({
 					chart: {
 						renderTo: id,
-						defaultSeriesType: type
+						defaultSeriesType: type,
+						backgroundColor: 'transparent'
 					},
+					colors: ['#2B4E72', '#2790B0', '#94BA65', '#353432', '#38936F', '#FFA600', '#AE324C', '#D5D638', '#884FA2'],
 					credits: {
 						enabled: false
 					},
@@ -17,7 +18,11 @@
 						enabled: false
 					},
 					title: {
-						text: title
+						text: title,
+						style: {
+							color: '#4E4D4A',
+							fontSize: '12px'
+						}
 					},
 					subtitle: {
 						text: subtitle

@@ -8,7 +8,7 @@ var gensym = (function() {
 
 var graphs = {};
 
-var update = function(data, name, type, id) {
+var updateChart = function(data, name, type, id) {
 	if (type in {'line':1,'histogram':1}) {
 		data.sort(lineSort);
 		/*data[set].line.forEach(function(item) {
@@ -38,8 +38,8 @@ var update = function(data, name, type, id) {
 };
 
 var create = function(data, name, type, id) {
-	var title = name;
-	var subtitle = type;
+	var title = (type === 'trend' ? 'Trend' : ''); //name;
+	var subtitle = ''; // type;
 	
 	if (type in {'bar':1, 'trend':1, 'histogram':1}) {
 		type = 'column';

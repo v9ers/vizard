@@ -21,110 +21,190 @@
 		<script src='/s/js/graph.js'></script>
 		
 		<script>
-		var load = function(url) {
-			$.getJSON(url, function(data) {
-				for (var name in data) {
-					var prop = data[name];
-					/*for (var type in data[name]) {
-						console.log(name, type)
-						if (data[name][type]) {
-							insertData(data[name][type], name, type);
-						}
-					}*/
+		var hash = location.pathname.replace('/g', '').substring(1);
 
-					var id = append(prop.type, name, prop);
-					console.log(id);
-					switch(prop.type) {
-						case 'number':
-							update(prop.line, name, 'line', id);
-						break;
-						case 'string':
-							update(prop.bar, name, 'bar', id);
-						break;
-						case 'boolean':
-							update(prop.choice, name, 'pie', id);
-						break;
-						default:
-						break;
+		var load = function(force) {
+			var go = function() {
+				$.getJSON('http://109.74.206.232/v/'+hash+'?window=30m', function(data) {
+					for (var name in data) {
+						var prop = data[name];
+						prop.title = name;
+						name = name.replace(/\s+/g,'-');
+						prop.name = name;
+						var id = update(prop.type, name, prop);
+						
+
+						switch(prop.type) {
+							case 'number':
+								
+								updateChart(prop.line, name, 'line', id);
+							break;
+							case 'string':
+								if(prop.bar) {
+									updateChart(prop.bar, name, 'bar', id);
+								}
+								if(prop.trend) {
+									updateChart(prop.trend, name, 'trend', id.replace('-chart-','-trend-'));	
+								}
+							break;
+							case 'boolean':
+								updateChart(prop.choice, name, 'pie', id);
+							break;
+							default:
+							break;
+						}
 					}
-				}
-			});
+					setTimeout(load, 1000);
+				});
+			}
+			if (force) {
+				go();
+				return;
+			}
+			$.get('http://109.74.206.232/n/'+hash, go);
 		};
 
-		var append = function(type, name, data) {
+		var update = function(type, name, data) {
 			if(!$('#' + type + '-' + name).size()) {
-				console.log(type,data);
-				console.log(render('#' + type, data));
 				$('#stats').append(render('#' + type, data));
 			}
-			
+			// update widget
+
+			if(type === 'string' && data.bar) {
+				$('#' + type + '-' + name + ' .widget').html(render('#' + type + '-widget',data));
+			}
+			if(type !== 'string') {
+				$('#' + type + '-' + name + ' .widget').html(render('#' + type + '-widget',data));
+			}
+
 			return  type + '-chart-' + name;
 		};
 
 		$(function() {
-			load('http://10.0.1.66:8008/v/freeall?period=1s&window=5h');
+			load(true);
 		});
 		</script>
 
 		<!-- templates -->
+		<script type='test/ejs' id='number-widget'>
+		<div class='number-widget'>
+			<div class='number-value' style='color: <%= fade(trend, "#AE324C", "#353432", "#94BA65") %>;'><%= total %></div>
+			<div class='number-stats'>
+				<div class='stat-row'>
+					<div class='stat-cell'>max <%= max.value.toFixed(2) %><br><span class='stat-date'><%= new Date(max.time).toUTCString() %></span></div>
+					<div class='stat-cell'>avg <%= average.toFixed(2) %></div>
+				</div>
+				<div class='stat-row'>
+					<div class='stat-cell'>min <%= min.value.toFixed(2) %><br><span class='stat-date'><%= new Date(min.time).toUTCString() %></span></div>
+					<div class='stat-cell'>stdv <%= std.toFixed(2) %></div>
+				</div>
+			</div>
+		</div>
+		</script>
 		<script type='test/ejs' id='number'>
 		<div class="container" id='number-<%= name %>'>
 			<div class="row">
 				<div class='twelevecol last'>
-					<p style='text-align:left'><%= name %></p>
+					<p style='text-align:left'><%= title %></p>
 				</div>
 			</div>
 			<div class="row">
 				<div class="eightcol chart" id='number-chart-<%= name %>'></div>
-				<div class="fourcol last">
-					<div class='number-widget'>			
-						<div class='number-value'>98</div>
-							<div class='number-stats'>
-								<div class='stat-row'>
-									<div class='stat-cell'>high <%= max.value %><br>date</div>
-									<div class='stat-cell'>avrg <%= average %></div>
-								</div>
-								<div style='clear:both'></div>
-								<div class='stat-row'>
-									<div class='stat-cell'>low <%= min.value %><br>date</div>
-									<div class='stat-cell'>std <%= std %></div>
-								</div>
-								<div style='clear:both'></div>
-							</div>
-							<div style='clear:both'></div>
-						</div>
-					</div>
-				</div>
+				<div class="fourcol last widget"></div>
 			</div>
 		</div>
 		</script>
 
-		<script type='test/ejs' id='string'>
+		<script type='text/ejs' id='string-widget'>
+		<table class="string-widget">
+			<tbody>
+				<%
+				var tableData = [];
+				var total = 0;
+
+				for (var value in bar) {
+					tableData.push({
+						value:value,
+						count:bar[value]
+					});
+					total += bar[value];
+				}
+				if (total <= 0) {
+					total = 1;
+				}
+
+				tableData.sort(columnSort);
+
+				for (var i = 0; i < tableData.length; i++) {
+					var row = tableData[i];
+					row.color = "#353432";
+
+					row.percentage = (row.count / total * 100).toFixed(0) + '%';
+					
+					var trendCount = 0;
+					
+					if (typeof trend !== 'undefined') {
+						trendCount = trend[row.value] || 0;					
+					}
+
+					row.color = fade(trendCount / row.count, "#AE324C", "#353432", "#94BA65");
+
+					%>
+				<tr><td class="string-value" style="color: <%= row.color %>;"><%= row.value %></td><td class="string-count"><%= row.count %></td><td class="string-percentage"><%= row.percentage %></td></tr>
+				<% } %>
+			</tbody>
+		</table>
+		</script>
+		<script type='text/ejs' id='string'>
 		<div class="container" id='string-<%= name %>'>
 			<div class="row">
 				<div class='twelevecol last'>
-					<p style='text-align:left'><%= name %></p>
+					<p style='text-align:left'><%= title %></p>
 				</div>
 			</div>
 			<div class="row">
-				<div class="eightcol chart" id='string-chart-<%= name %>'></div>
-				<div class="fourcol last">
+				<% if (typeof trend === 'undefined') {%>
+					<div class="eightcol chart" id='string-chart-<%= name %>'></div>
+				<%} else if (typeof bar === 'undefined') {%>
+					<div class="twelvecol chart" id='string-trend-<%= name %>'></div>
+				<%} else {%>
+					<div class="fivecol chart" id='string-chart-<%= name %>'></div>
+					<div class="threecol chart" id='string-trend-<%= name %>'></div>
+				<% }
+				if (typeof bar !== 'undefined') {%>
+				<div class="fourcol last widget"></div>
+				<% } %>
+
+			</div>
+		</div>
+		</script>
+		
+		<script type='test/ejs' id='boolean-widget'>
+		<div class='boolean-widget'>
+			<div class='boolean-stats'>
+				<div class='stat-row'>
+					<div class='stat-cell boolean-value'><%= choice.yes > choice.no ? 'YES' : 'NO' %></div>
+					<div class='stat-cell'><%= choice.yes > choice.no ? choice.yes : choice.no %>
+					<span class="stat-percentage"><%= ((choice.yes > choice.no ? choice.yes : choice.no) / (choice.yes + choice.no) * 100).toFixed(0) %>%</span></div>
+				</div>
+				<div class='stat-row'>
+					<div class='stat-cell' style='width: 40px'><%= choice.yes > choice.no ? 'NO' : 'YES' %></div>
+					<div class='stat-cell'><%= choice.yes > choice.no ? choice.no : choice.yes %>
+					<span class="stat-percentage"><%= ((choice.yes > choice.no ? choice.no : choice.yes) / (choice.yes + choice.no) * 100).toFixed(0) %>%</span></div>
 				</div>
 			</div>
 		</div>
 		</script>
-
 		<script type='test/ejs' id='boolean'>
 		<div class="container" id='boolean-<%= name %>'>
 			<div class="row">
 				<div class='twelevecol last'>
-					<p style='text-align:left'><%= name %></p>
+					<p style='text-align:left'><%= title %></p>
 				</div>
 			</div>
 			<div class="row">
 				<div class="eightcol chart" id='boolean-chart-<%= name %>'></div>
-				<div class="fourcol last">
-				</div>
+				<div class="fourcol last widget"></div>
 			</div>
 		</div>
 		</script>

@@ -1,85 +1,33 @@
-// main function to process the fade request //
-function colorFade(id,element,start,end,steps,speed) {
-  var startrgb,endrgb,er,eg,eb,step,rint,gint,bint,step;
-  var target = document.getElementById(id);
-  steps = steps || 20;
-  speed = speed || 20;
-  clearInterval(target.timer);
-  endrgb = colorConv(end);
-  er = endrgb[0];
-  eg = endrgb[1];
-  eb = endrgb[2];
-  if(!target.r) {
-    startrgb = colorConv(start);
-    r = startrgb[0];
-    g = startrgb[1];
-    b = startrgb[2];
-    target.r = r;
-    target.g = g;
-    target.b = b;
-  }
-  rint = Math.round(Math.abs(target.r-er)/steps);
-  gint = Math.round(Math.abs(target.g-eg)/steps);
-  bint = Math.round(Math.abs(target.b-eb)/steps);
-  if(rint == 0) { rint = 1 }
-  if(gint == 0) { gint = 1 }
-  if(bint == 0) { bint = 1 }
-  target.step = 1;
-  target.timer = setInterval( function() { animateColor(id,element,steps,er,eg,eb,rint,gint,bint) }, speed);
-}
+var interpolateColor = function(minColor,maxColor,maxDepth,depth){
+    function d2h(d) {return d.toString(16);}
+    function h2d(h) {return parseInt(h,16);}
+   
+    if(depth == 0){
+        return minColor;
+    }
+    if(depth == maxDepth){
+        return maxColor;
+    }
+   
+    var color = "#";
+   
+    for(var i=1; i <= 6; i+=2){
+        var minVal = new Number(h2d(minColor.substr(i,2)));
+        var maxVal = new Number(h2d(maxColor.substr(i,2)));
+        var nVal = minVal + (maxVal-minVal) * (depth/maxDepth);
+        var val = d2h(Math.floor(nVal));
+        while(val.length < 2){
+            val = "0"+val;
+        }
+        color += val;
+    }
+    return color;
+};
 
-// incrementally close the gap between the two colors //
-function animateColor(id,element,steps,er,eg,eb,rint,gint,bint) {
-  var target = document.getElementById(id);
-  var color;
-  if(target.step <= steps) {
-    var r = target.r;
-    var g = target.g;
-    var b = target.b;
-    if(r >= er) {
-      r = r - rint;
-    } else {
-      r = parseInt(r) + parseInt(rint);
-    }
-    if(g >= eg) {
-      g = g - gint;
-    } else {
-      g = parseInt(g) + parseInt(gint);
-    }
-    if(b >= eb) {
-      b = b - bint;
-    } else {
-      b = parseInt(b) + parseInt(bint);
-    }
-    color = 'rgb(' + r + ',' + g + ',' + b + ')';
-    if(element == 'background') {
-      target.style.backgroundColor = color;
-    } else if(element == 'border') {
-      target.style.borderColor = color;
-    } else {
-      target.style.color = color;
-    }
-    target.r = r;
-    target.g = g;
-    target.b = b;
-    target.step = target.step + 1;
+var fade = function(val, start, middle, end) {
+  if(val > 0) {
+    return interpolateColor(middle,end,1,val);
   } else {
-    clearInterval(target.timer);
-    color = 'rgb(' + er + ',' + eg + ',' + eb + ')';
-    if(element == 'background') {
-      target.style.backgroundColor = color;
-    } else if(element == 'border') {
-      target.style.borderColor = color;
-    } else {
-      target.style.color = color;
-    }
+    return interpolateColor(middle,start,1,-val);
   }
-}
-
-// convert the color to rgb from hex //
-function colorConv(color) {
-  var rgb = [parseInt(color.substring(0,2),16), 
-    parseInt(color.substring(2,4),16), 
-    parseInt(color.substring(4,6),16)];
-  return rgb;
-}
+};

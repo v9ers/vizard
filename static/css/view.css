@@ -1,19 +1,105 @@
 body {
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	background-image: url('/s/img/body.gif');
 }
 li {
 	float:left;
 	margin-right: 10px;
 }
 .container p {
-	color: #fff;
+	color: #353432;
+	opacity: 0.6;
 	line-height: 50px;
-	background: #000;
+	background: #fff; /* #F1F2F3; */
 	text-align: center;
+	text-transform: capitalize;
 	padding-left: 10px;
-	margin: 10px 0 0 0;
+	margin: 20px 0 20px 0;
+
 }
 
-.number-value, .number-stats, .stat-cell {
-	float:left;
+.chart {
+	height: 200px;
+}
+
+.number-value {
+	color: #353432;
+	font-size: 50px;
+	line-height: 100px;
+}
+
+.boolean-value {
+	color: #353432;
+	font-size: 50px;
+	line-height: 50px;
+}
+
+.stat-row {
+	padding-bottom: 20px;
+}
+
+.stat-cell {
+	display: inline-block;
+	vertical-align: top;
+	width: 160px;
+	color: #4E4D4A;
+	white-space: nowrap;
+}
+.boolean-widget {
+	margin-top: 25px;	
+}
+
+.boolean-widget .stat-cell {
+	width: 110px;
+	vertical-align: middle;
+}
+
+.number-widget .stat-cell {
+	font-size: 14px;
+	line-height: 16px;
+}
+
+.stat-date {
+	font-size: 10px;
+	line-height: 14px;
+	color: #B3B3B3;
+	font-weight: bold;
+}
+
+.stat-percentage {
+	color: #B3B3B3;
+	font-weight: bold;
+}
+
+.boolean-widget .stat-percentage {
+	padding-left: 20px;
+}
+
+.string-widget {
+	margin: 22px 0 0 0;
+	border-collapse: collapse;
+	color: #353432;
+	font-size: 100%;
+	line-height: 26px;
+}
+
+.string-widget td {
+	padding: 0 25px;
+}
+
+.string-value {
+	text-align: left;
+	padding-left: 0 !important;
+}
+
+.string-count, .string-percentage {
+	text-align: right;
+}
+
+.string-count {
+	color: #4E4D4A;
+}
+
+.string-percentage {
+	color: #B3B3B3;
 }

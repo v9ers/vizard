@@ -232,9 +232,14 @@ server.post('/r/{id}', jsonify(function(request, data, respond) {
 }));
 
 server.get('/n/{id}/{*}?', jsonify(function(request, respond) {
-	notify.once(request.params.id, function() {
-		respond({success:true});	
+	var fn = function() {
+		respond({success:true});		
+	};
+
+	request.on('close', function() {
+		notify.removeListener(request.params.id, fn);
 	});
+	notify.once(request.params.id, fn);
 }));
 
 server.get('/r/{id}', jsonify(function(request, respond) {
@@ -351,7 +356,7 @@ server.get('/g/*', function(request, response) {
 	};
 
 	db.series.findOne({id:request.params.wildcard.split('/')[0]}, function(err, exists) {
-		fs.readFile(exists ? './static/graphs.html' : './static/add.html', common.fork(onerror, function(buf) {
+		fs.readFile(exists ? './static/view.html' : './static/add.html', common.fork(onerror, function(buf) {
 			response.writeHead(200);
 			response.end(buf);
 		}));
@@ -359,4 +364,4 @@ server.get('/g/*', function(request, response) {
 });
 server.get('/*', '/g/{*}', server.route);
 
-server.listen(80);
+server.listen(8008);
