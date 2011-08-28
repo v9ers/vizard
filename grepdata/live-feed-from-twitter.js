@@ -25,6 +25,8 @@ var searchTwitterAndPostToVizard = (function() {
 	var oldResultIds = {};
 	var badWords = { 'the': 1, 'and': 1, 'you': 1, 'http': 1 };
 
+	var messageCount = 0;
+
 	return function() {
 		twitter.search(query, function(err, response) {
 			if (err) {
@@ -46,6 +48,7 @@ var searchTwitterAndPostToVizard = (function() {
 			});
 			vizard.post(vizardNames.response, response);
 			results.forEach(function(result) {
+				messageCount++;
 
 				var text = result.text.replace(/('|http:\/\/\S+)/g, '');
 
@@ -58,7 +61,8 @@ var searchTwitterAndPostToVizard = (function() {
 				words.forEach(function(word) {
 					vizard.post(vizardNames.result, {
 						language: result.iso_language_code,
-						word: word
+						word: word,
+						messages: messageCount
 					});
 				});
 			});
